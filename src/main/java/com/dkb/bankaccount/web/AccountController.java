@@ -6,10 +6,7 @@ import com.dkb.bankaccount.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,5 +18,10 @@ public class AccountController {
     @ResponseStatus(HttpStatus.CREATED)
     private AccountDTO createAccount(@RequestBody @Validated AccountCreateRequest request){
         return accountService.createAccount(request);
+    }
+
+    @GetMapping("/accounts/iban/{iban}")
+    private AccountDTO getAccountDetail(@PathVariable("iban") String iban){
+        return accountService.getAccountDetail(iban);
     }
 }

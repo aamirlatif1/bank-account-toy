@@ -8,6 +8,7 @@ import com.dkb.bankaccount.service.AccountService;
 import com.dkb.bankaccount.service.IbanService;
 import lombok.RequiredArgsConstructor;
 import org.iban4j.Iban;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,6 +17,7 @@ public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
     private final IbanService ibanService;
+    private final ModelMapper modelMapper;
 
     public AccountDTO createAccount(AccountCreateRequest request) {
 
@@ -34,8 +36,11 @@ public class AccountServiceImpl implements AccountService {
 
         accountRepository.save(newAccount);
 
-        return AccountDTO.builder()
-                .iban(newAccount.getIban())
-                .build();
+        return modelMapper.map(newAccount, AccountDTO.class);
+    }
+
+    @Override
+    public AccountDTO getAccountDetail(String iban) {
+        return null;
     }
 }

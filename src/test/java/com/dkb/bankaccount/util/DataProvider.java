@@ -2,8 +2,11 @@ package com.dkb.bankaccount.util;
 
 
 import com.dkb.bankaccount.dto.AccountCreateRequest;
+import com.dkb.bankaccount.dto.AccountDTO;
 import org.iban4j.CountryCode;
 import org.iban4j.Iban;
+
+import java.math.BigDecimal;
 
 public final class DataProvider {
 
@@ -23,6 +26,15 @@ public final class DataProvider {
                 .countryCode(CountryCode.DE)
                 .bankCode(BANK_CODE)
                 .accountNumber(String.format("%010d", number))
+                .build();
+    }
+
+    public static AccountDTO createAccountDTO() {
+        return AccountDTO.builder()
+                .iban(IBAN)
+                .currentBalance(BigDecimal.ZERO)
+                .firstName("First")
+                .lastName("Last")
                 .build();
     }
 }
