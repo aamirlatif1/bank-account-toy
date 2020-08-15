@@ -13,9 +13,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
-import static com.dkb.bankaccount.util.DataProvider.createIban;
-import static com.dkb.bankaccount.util.DataProvider.getAccountCreateRequest;
+import static com.dkb.bankaccount.util.DataProvider.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -35,30 +35,38 @@ class AccountServiceTest {
 
     @BeforeEach
     void setUp() {
-        when(ibanService.generateIban(1))
-                .thenReturn(createIban(1));
-
-        BankAccount bankAccount = new BankAccount();
-        bankAccount.setCurrentBalance(BigDecimal.ZERO);
-        bankAccount.setId(1L);
-
-        when(accountRepository.save(any(BankAccount.class)))
-                .thenReturn(bankAccount);
-
         modelMapper = new ModelMapper();
-
         accountService = new AccountServiceImpl(accountRepository, ibanService, modelMapper);
     }
 
     @Test
     public void createAccountSuccess() {
+        when(ibanService.generateIban(1234567L))
+                .thenReturn(createIban(1234567L));
+
+        when(accountRepository.save(any(BankAccount.class)))
+                .thenReturn(createBankAccount(BigDecimal.ZERO));
         AccountCreateRequest request = getAccountCreateRequest();
 
         AccountDTO accountDTO = accountService.createAccount(request);
 
-        assertThat(accountDTO.getIban()).containsPattern("DE.*12030000");
+        assertThat(accountDTO.getIban()).isEqualTo(IBAN);
         assertThat(accountDTO.getCurrentBalance()).isEqualTo(BigDecimal.ZERO);
 
+    }
+
+    @Test
+    public void getAccountDetailSuccess() {
+
+        when(accountRepository.findFirstByIban(IBAN))
+                .thenReturn(Optional.of(createBankAccount(BigDecimal.valueOf(1000.50))));
+
+        AccountDTO accountDTO = accountService.getAccountDetail(IBAN);
+
+        assertThat(accountDTO.getIban()).containsPattern(IBAN);
+        assertThat(accountDTO.getCurrentBalance()).isEqualTo(BigDecimal.valueOf(1000.50));
+        assertThat(accountDTO.getFirstName()).isEqualTo(FIRST_NAME);
+        assertThat(accountDTO.getLastName()).isEqualTo(LAST_NAME);
     }
 
 }

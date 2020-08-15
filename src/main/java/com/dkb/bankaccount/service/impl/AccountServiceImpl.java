@@ -3,6 +3,7 @@ package com.dkb.bankaccount.service.impl;
 import com.dkb.bankaccount.dto.AccountCreateRequest;
 import com.dkb.bankaccount.dto.AccountDTO;
 import com.dkb.bankaccount.entity.BankAccount;
+import com.dkb.bankaccount.exception.AccountNotFoundException;
 import com.dkb.bankaccount.repository.AccountRepository;
 import com.dkb.bankaccount.service.AccountService;
 import com.dkb.bankaccount.service.IbanService;
@@ -41,6 +42,9 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountDTO getAccountDetail(String iban) {
-        return null;
+        BankAccount bankAccount = accountRepository.findFirstByIban(iban)
+                .orElseThrow(() -> new AccountNotFoundException(String.format("account for iban : %s not exist", iban)));
+
+        return modelMapper.map(bankAccount, AccountDTO.class);
     }
 }

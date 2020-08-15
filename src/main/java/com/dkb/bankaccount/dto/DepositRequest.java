@@ -6,19 +6,23 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccountCreateRequest {
+public class DepositRequest {
 
     @NotBlank
-    private String firstName;
+    private String iban;
 
-    @NotBlank
-    private String lastName;
+    @NotNull
+    private BigDecimal amount;
 
-    private String address;
+    private String reference;
+
+    private String details;
 
 }
