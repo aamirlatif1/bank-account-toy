@@ -11,8 +11,10 @@ import java.math.BigDecimal;
 
 public final class DataProvider {
 
+    public static final long ACCOUNT_ID = 1234567L;
     public static final String IBAN = "DE64120300000001234567";
-    public static final String DEST_IBAN = "DE64120300000001234567";
+    public static final String DEST_IBAN = "DE80120300000007654321";
+    public static final String INVALID_IBAN = "DE64120300000001111111";
     public static final String ACCOUNT_NUMBER = "0001234567";
     public static final String BANK_CODE = "12030000";
     public static final String FIRST_NAME = "First";
@@ -35,14 +37,18 @@ public final class DataProvider {
         return DepositRequest.builder()
                 .amount(BigDecimal.valueOf(TRANSACTION_AMOUNT))
                 .iban(IBAN)
+                .details(TRANSACTION_DETAILS)
+                .reference(TRANSACTION_REFERENCE)
                 .build();
     }
 
     public static TransferRequest createTransferRequest() {
         return TransferRequest.builder()
                 .amount(BigDecimal.valueOf(TRANSACTION_AMOUNT))
+                .details(TRANSACTION_DETAILS)
+                .reference(TRANSACTION_REFERENCE)
                 .sourceAccount(IBAN)
-                .destinationAccount("")
+                .destinationAccount(DEST_IBAN)
                 .build();
     }
 
@@ -72,16 +78,17 @@ public final class DataProvider {
                 .build();
     }
 
-    public static BankAccount createBankAccount(BigDecimal currentBalance) {
+    public static BankAccount createBankAccount(double currentBalance) {
         return BankAccount.builder()
                 .id(1234567L)
                 .firstName(FIRST_NAME)
                 .lastName(LAST_NAME)
                 .address(ADDRESS)
+                .overdraftLimit(BigDecimal.ZERO)
                 .iban(IBAN)
                 .accountStatus(AccountStatus.ACTIVE)
                 .accountNumber(ACCOUNT_NUMBER)
-                .currentBalance(currentBalance)
+                .currentBalance(BigDecimal.valueOf(currentBalance))
                 .build();
     }
 }

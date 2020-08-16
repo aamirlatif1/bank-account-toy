@@ -2,7 +2,6 @@ package com.dkb.bankaccount.service;
 
 
 import com.dkb.bankaccount.service.impl.IbanServiceImpl;
-import com.dkb.bankaccount.util.DataProvider;
 import org.iban4j.Iban;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

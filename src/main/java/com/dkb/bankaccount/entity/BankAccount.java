@@ -9,7 +9,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Entity
 @AllArgsConstructor
@@ -35,4 +34,6 @@ public class BankAccount {
     private AccountStatus accountStatus;
 
     private BigDecimal currentBalance;
+
+    private BigDecimal overdraftLimit;
 }

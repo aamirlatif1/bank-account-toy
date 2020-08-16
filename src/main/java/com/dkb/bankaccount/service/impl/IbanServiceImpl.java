@@ -1,11 +1,13 @@
 package com.dkb.bankaccount.service.impl;
 
 import com.dkb.bankaccount.service.IbanService;
+import lombok.extern.slf4j.Slf4j;
 import org.iban4j.CountryCode;
 import org.iban4j.Iban;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class IbanServiceImpl implements IbanService {
 

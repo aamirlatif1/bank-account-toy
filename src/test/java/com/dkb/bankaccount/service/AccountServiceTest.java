@@ -3,8 +3,10 @@ package com.dkb.bankaccount.service;
 import com.dkb.bankaccount.dto.AccountCreateRequest;
 import com.dkb.bankaccount.dto.AccountDTO;
 import com.dkb.bankaccount.entity.BankAccount;
+import com.dkb.bankaccount.exception.AccountNotFoundException;
 import com.dkb.bankaccount.repository.AccountRepository;
 import com.dkb.bankaccount.service.impl.AccountServiceImpl;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,17 +43,17 @@ class AccountServiceTest {
 
     @Test
     public void createAccountSuccess() {
-        when(ibanService.generateIban(1234567L))
-                .thenReturn(createIban(1234567L));
+        when(ibanService.generateIban(ACCOUNT_ID))
+                .thenReturn(createIban(ACCOUNT_ID));
 
         when(accountRepository.save(any(BankAccount.class)))
-                .thenReturn(createBankAccount(BigDecimal.ZERO));
+                .thenReturn(createBankAccount(0.0));
         AccountCreateRequest request = getAccountCreateRequest();
 
         AccountDTO accountDTO = accountService.createAccount(request);
 
         assertThat(accountDTO.getIban()).isEqualTo(IBAN);
-        assertThat(accountDTO.getCurrentBalance()).isEqualTo(BigDecimal.ZERO);
+        assertThat(accountDTO.getCurrentBalance()).isEqualTo(BigDecimal.valueOf(0.0));
 
     }
 
@@ -59,7 +61,7 @@ class AccountServiceTest {
     public void getAccountDetailSuccess() {
 
         when(accountRepository.findFirstByIban(IBAN))
-                .thenReturn(Optional.of(createBankAccount(BigDecimal.valueOf(1000.50))));
+                .thenReturn(Optional.of(createBankAccount(1000.50)));
 
         AccountDTO accountDTO = accountService.getAccountDetail(IBAN);
 
@@ -67,6 +69,14 @@ class AccountServiceTest {
         assertThat(accountDTO.getCurrentBalance()).isEqualTo(BigDecimal.valueOf(1000.50));
         assertThat(accountDTO.getFirstName()).isEqualTo(FIRST_NAME);
         assertThat(accountDTO.getLastName()).isEqualTo(LAST_NAME);
+    }
+
+    @Test
+    public void getInvalidAccount_throwAccountNotFoundException() {
+        when(accountRepository.findFirstByIban(INVALID_IBAN))
+                .thenReturn(Optional.empty());
+
+        Assertions.assertThrows(AccountNotFoundException.class, () -> accountService.getAccountDetail(INVALID_IBAN));
     }
 
 }

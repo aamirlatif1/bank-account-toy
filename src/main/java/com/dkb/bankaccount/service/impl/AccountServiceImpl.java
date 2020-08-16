@@ -8,11 +8,15 @@ import com.dkb.bankaccount.repository.AccountRepository;
 import com.dkb.bankaccount.service.AccountService;
 import com.dkb.bankaccount.service.IbanService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.iban4j.Iban;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
 
@@ -20,18 +24,17 @@ public class AccountServiceImpl implements AccountService {
     private final IbanService ibanService;
     private final ModelMapper modelMapper;
 
-    public AccountDTO createAccount(AccountCreateRequest request) {
+    public AccountDTO createAccount(final AccountCreateRequest request) {
 
-        BankAccount account = new BankAccount();
+        final BankAccount account = new BankAccount();
         account.setFirstName(request.getFirstName());
         account.setLastName(request.getLastName());
         account.setAddress(request.getAddress());
+        account.setOverdraftLimit(BigDecimal.ZERO);
 
-        BankAccount newAccount = accountRepository.save(account);
+        final BankAccount newAccount = accountRepository.save(account);
 
-        Iban iban = ibanService.generateIban(newAccount.getId());
-
-
+        final Iban iban = ibanService.generateIban(newAccount.getId());
         newAccount.setIban(iban.toString());
         newAccount.setAccountNumber(iban.getAccountNumber());
 
@@ -41,9 +44,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountDTO getAccountDetail(String iban) {
-        BankAccount bankAccount = accountRepository.findFirstByIban(iban)
-                .orElseThrow(() -> new AccountNotFoundException(String.format("account for iban : %s not exist", iban)));
+    public AccountDTO getAccountDetail(final String iban) {
+        final BankAccount bankAccount = accountRepository.findFirstByIban(iban)
+                .orElseThrow(() -> new AccountNotFoundException(iban));
 
         return modelMapper.map(bankAccount, AccountDTO.class);
     }

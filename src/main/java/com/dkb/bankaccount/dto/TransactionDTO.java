@@ -15,6 +15,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class TransactionDTO {
 
+    private Long transactionId;
+    private Long relatedTransactionId;
     private BigDecimal amount;
     private BigDecimal runningBalance;
     private String reference;
