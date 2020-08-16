@@ -6,7 +6,6 @@ import com.dkb.bankaccount.entity.BankAccount;
 import com.dkb.bankaccount.exception.AccountNotFoundException;
 import com.dkb.bankaccount.repository.AccountRepository;
 import com.dkb.bankaccount.service.impl.AccountServiceImpl;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,6 +18,7 @@ import java.util.Optional;
 
 import static com.dkb.bankaccount.util.DataProvider.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -76,7 +76,7 @@ class AccountServiceTest {
         when(accountRepository.findFirstByIban(INVALID_IBAN))
                 .thenReturn(Optional.empty());
 
-        Assertions.assertThrows(AccountNotFoundException.class, () -> accountService.getAccountDetail(INVALID_IBAN));
+        assertThrows(AccountNotFoundException.class, () -> accountService.getAccountDetail(INVALID_IBAN));
     }
 
 }

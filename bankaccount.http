@@ -1,0 +1,43 @@
+
+### Create bank account
+POST http://localhost:8080/accounts
+Content-Type: application/json
+
+{
+    "firstName": "Aamir",
+    "lastName": "Latif",
+    "address": "Berlin"
+}
+
+
+### show account balance
+GET http://localhost:8080/accounts/iban/{{iban}}
+Accept: application/json
+
+
+### Deposit amount in bank
+POST http://localhost:8080/transactions/deposit
+Content-Type: application/json
+
+{
+  "iban": {{iban}},
+  "amount": 100,
+  "reference": "cash deposit",
+  "details": "deposited from bank"
+}
+
+### transfer amount to other account
+POST http://localhost:8080/transactions/transfer
+Content-Type: application/json
+
+{
+  "sourceAccount": {{iban}},
+  "destinationAccount": {{iban2}},
+  "amount": 100,
+  "reference": "cash transfer from account",
+  "details": "Online transfer"
+}
+
+### Get transaction history
+GET http://localhost:8080/transactions/history?date=2022-06-22&page=0&size=10
+Accept: application/json

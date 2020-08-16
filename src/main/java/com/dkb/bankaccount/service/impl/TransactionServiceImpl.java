@@ -2,6 +2,7 @@ package com.dkb.bankaccount.service.impl;
 
 import com.dkb.bankaccount.dto.DepositRequest;
 import com.dkb.bankaccount.dto.TransactionDTO;
+import com.dkb.bankaccount.dto.TransactionHistoryDTO;
 import com.dkb.bankaccount.dto.TransferRequest;
 import com.dkb.bankaccount.entity.BankAccount;
 import com.dkb.bankaccount.entity.Transaction;
@@ -93,5 +94,10 @@ public class TransactionServiceImpl implements TransactionService {
         transactionRepository.saveAll(Arrays.asList(transaction, revTransaction));
 
         return modelMapper.map(revTransaction, TransactionDTO.class);
+    }
+
+    @Override
+    public TransactionHistoryDTO searchTransactions(LocalDate fromDate, LocalDate toDate, TransactionType transactionType) {
+        return null;
     }
 }

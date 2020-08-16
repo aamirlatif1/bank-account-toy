@@ -1,0 +1,35 @@
+version: '3'
+services:
+
+  postgresdb:
+    container_name: postgresdb
+    image: "postgres"
+    ports:
+      - "5432:5432"
+    networks:
+      - backend
+    environment:
+      POSTGRES_USER: dkb_user
+      POSTGRES_PASSWORD: dkb_pass
+      POSTGRES_DB: dkbbank
+    volumes:
+      - database-data:/var/lib/postgresql/data/
+
+  bankaccount:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+    - "8080:8080"
+    restart: always
+    depends_on:
+      - postgresdb
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgresdb:5432/dkbbank
+      SPRING_DATASOURCE_USERNAME: dkb_user
+      SPRING_DATASOURCE_PASSWORD: dkb_pass
+    networks:
+      - backend
+
+networks:
+  backend:
