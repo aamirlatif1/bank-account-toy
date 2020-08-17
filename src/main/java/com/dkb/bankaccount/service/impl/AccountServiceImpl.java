@@ -26,6 +26,7 @@ public class AccountServiceImpl implements AccountService {
 
     public AccountDTO createAccount(final AccountCreateRequest request) {
 
+        log.info("creating account for user={} {}", request.getFirstName(), request.getLastName());
         final BankAccount account = new BankAccount();
         account.setFirstName(request.getFirstName());
         account.setLastName(request.getLastName());
@@ -45,6 +46,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountDTO getAccountDetail(final String iban) {
+        log.info("getting details of account iban={}", iban);
         final BankAccount bankAccount = accountRepository.findFirstByIban(iban)
                 .orElseThrow(() -> new AccountNotFoundException(iban));
 

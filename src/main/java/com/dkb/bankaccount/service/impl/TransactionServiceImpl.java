@@ -4,9 +4,11 @@ import com.dkb.bankaccount.dto.DepositRequest;
 import com.dkb.bankaccount.dto.TransactionDTO;
 import com.dkb.bankaccount.dto.TransactionHistoryDTO;
 import com.dkb.bankaccount.dto.TransferRequest;
+import com.dkb.bankaccount.entity.AccountStatus;
 import com.dkb.bankaccount.entity.BankAccount;
 import com.dkb.bankaccount.entity.Transaction;
 import com.dkb.bankaccount.entity.TransactionType;
+import com.dkb.bankaccount.exception.AccountLockedException;
 import com.dkb.bankaccount.exception.AccountNotFoundException;
 import com.dkb.bankaccount.exception.InvalidAmountException;
 import com.dkb.bankaccount.repository.AccountRepository;
@@ -36,6 +38,8 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionDTO depositAmount(final DepositRequest request) {
+        log.info("deposit amount={} for iban={}",request.getAmount(), request.getIban());
+
         final BankAccount bankAccount = accountRepository.findFirstByIban(request.getIban())
                 .orElseThrow(() -> new AccountNotFoundException(request.getIban()));
 
@@ -57,11 +61,13 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional
     public TransactionDTO transferAmount(TransferRequest request) {
-        BankAccount sourceAccount = accountRepository.findFirstByIban(request.getSourceAccount())
-                .orElseThrow(() -> new AccountNotFoundException(request.getSourceAccount()));
+        String sourceIban = request.getSourceAccount();
+        String destIban = request.getDestinationAccount();
+        log.info("transfer amount={} form iban={} to iban={}",request.getAmount(),
+                sourceIban, destIban);
 
-        BankAccount destAccount = accountRepository.findFirstByIban(request.getDestinationAccount())
-                .orElseThrow(() -> new AccountNotFoundException(request.getDestinationAccount()));
+        BankAccount sourceAccount = getBankAccountIfValid(sourceIban);
+        BankAccount destAccount = getBankAccountIfValid(destIban);
 
         if (sourceAccount.getCurrentBalance().add(sourceAccount.getOverdraftLimit())
                 .subtract(request.getAmount()).compareTo(BigDecimal.ZERO) < 0) {
@@ -95,14 +101,25 @@ public class TransactionServiceImpl implements TransactionService {
         revTransaction.setRelatedTransactionId(transaction.getId());
 
         transactionRepository.saveAll(Arrays.asList(transaction, revTransaction));
-
+        log.info("amount={} transfer to account={}", request.getAmount(), request.getSourceAccount() );
         return modelMapper.map(revTransaction, TransactionDTO.class);
+    }
+
+    private BankAccount getBankAccountIfValid(String iban) {
+        BankAccount sourceAccount = accountRepository.findFirstByIban(iban)
+                .orElseThrow(() -> new AccountNotFoundException(iban));
+        if (!sourceAccount.getAccountStatus().equals(AccountStatus.ACTIVE)) {
+            log.info("account with iban={} is locked", iban);
+            throw new AccountLockedException(iban);
+        }
+        return sourceAccount;
     }
 
     @Override
     public TransactionHistoryDTO searchTransactions(String iban, LocalDate fromDate,
                                                     LocalDate toDate, TransactionType transactionType) {
 
+        log.info("searching account history for iban={}", iban);
         final BankAccount bankAccount = accountRepository.findFirstByIban(iban)
                 .orElseThrow(() -> new AccountNotFoundException(iban));
 
