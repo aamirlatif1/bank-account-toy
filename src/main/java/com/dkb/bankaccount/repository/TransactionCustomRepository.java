@@ -7,5 +7,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface TransactionCustomRepository {
-    List<Transaction> findUserByEmails(LocalDate fromDate, LocalDate toDate, TransactionType transactionType);
+    List<Transaction> findTransactionByDate(Long accountId, LocalDate fromDate,
+                                            LocalDate toDate, TransactionType transactionType);
 }

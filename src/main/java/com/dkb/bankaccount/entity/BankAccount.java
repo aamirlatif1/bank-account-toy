@@ -5,10 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
@@ -33,6 +30,7 @@ public class BankAccount {
 
     private String accountNumber;
 
+    @Enumerated(EnumType.STRING)
     private AccountStatus accountStatus;
 
     private BigDecimal currentBalance;

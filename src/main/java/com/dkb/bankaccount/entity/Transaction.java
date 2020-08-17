@@ -5,12 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "transactions")
@@ -28,6 +26,7 @@ public class Transaction {
 
     private BigDecimal runningBalance;
 
+    @Enumerated(EnumType.STRING)
     private TransactionType transactionType;
 
     private Long relatedTransactionId;
@@ -38,5 +37,5 @@ public class Transaction {
 
     private String reference;
 
-    private LocalDate transactionDate;
+    private LocalDateTime transactionDate;
 }

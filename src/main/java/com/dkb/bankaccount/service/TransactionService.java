@@ -14,5 +14,6 @@ public interface TransactionService {
 
     TransactionDTO transferAmount(TransferRequest request);
 
-    TransactionHistoryDTO searchTransactions(LocalDate fromDate, LocalDate toDate, TransactionType transactionType);
+    TransactionHistoryDTO searchTransactions(String iban, LocalDate fromDate,
+                                             LocalDate toDate, TransactionType transactionType);
 }

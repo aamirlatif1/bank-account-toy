@@ -20,7 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -43,7 +46,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .reference(request.getReference())
                 .amount(request.getAmount())
                 .runningBalance(bankAccount.getCurrentBalance().add(request.getAmount()))
-                .transactionDate(LocalDate.now())
+                .transactionDate(LocalDateTime.now())
                 .build();
 
         transactionRepository.save(transaction);
@@ -65,24 +68,24 @@ public class TransactionServiceImpl implements TransactionService {
             throw new InvalidAmountException("transaction amount is more than current balance");
         }
 
-        Transaction transaction = Transaction.builder()
+        final Transaction transaction = Transaction.builder()
                 .accountId(sourceAccount.getId())
                 .transactionType(TransactionType.DEPOSIT)
                 .details(request.getDetails())
                 .reference(request.getReference())
                 .amount(request.getAmount())
                 .runningBalance(sourceAccount.getCurrentBalance().add(request.getAmount()))
-                .transactionDate(LocalDate.now())
+                .transactionDate(LocalDateTime.now())
                 .build();
 
-        Transaction revTransaction = Transaction.builder()
+        final Transaction revTransaction = Transaction.builder()
                 .accountId(destAccount.getId())
                 .transactionType(TransactionType.WITHDRAWAL)
                 .details(request.getDetails())
                 .reference(request.getReference())
                 .amount(request.getAmount())
                 .runningBalance(sourceAccount.getCurrentBalance().subtract(request.getAmount()))
-                .transactionDate(LocalDate.now())
+                .transactionDate(LocalDateTime.now())
                 .build();
 
 
@@ -97,7 +100,26 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public TransactionHistoryDTO searchTransactions(LocalDate fromDate, LocalDate toDate, TransactionType transactionType) {
-        return null;
+    public TransactionHistoryDTO searchTransactions(String iban, LocalDate fromDate,
+                                                    LocalDate toDate, TransactionType transactionType) {
+
+        final BankAccount bankAccount = accountRepository.findFirstByIban(iban)
+                .orElseThrow(() -> new AccountNotFoundException(iban));
+
+        final List<Transaction> transactions =  transactionRepository.findTransactionByDate(bankAccount.getId(), fromDate, toDate, transactionType);
+        final TransactionHistoryDTO transactionHistory = modelMapper.map(bankAccount, TransactionHistoryDTO.class);
+
+        if(!transactions.isEmpty()) {
+            Transaction firstTransaction = transactions.get(0);
+            transactionHistory.setOpeningBalance(firstTransaction.getRunningBalance().subtract(firstTransaction.getAmount()));
+            transactionHistory.setClosingBalance(transactions.get(transactions.size()-1).getRunningBalance());
+
+            List<TransactionDTO> transactionDTOS = transactions.stream()
+                    .map(v -> modelMapper.map(v, TransactionDTO.class))
+                    .collect(Collectors.toList());
+            transactionHistory.setTransactions(transactionDTOS);
+        }
+
+        return transactionHistory;
     }
 }

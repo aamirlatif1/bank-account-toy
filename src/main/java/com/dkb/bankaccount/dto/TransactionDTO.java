@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 @Builder
 @Data
@@ -22,6 +24,6 @@ public class TransactionDTO {
     private String reference;
     private String details;
     private TransactionType type;
-    private LocalDate transactionDate;
+    private LocalDateTime transactionDate;
 
 }
