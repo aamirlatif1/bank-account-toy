@@ -12,15 +12,13 @@ services:
       POSTGRES_USER: dkb_user
       POSTGRES_PASSWORD: dkb_pass
       POSTGRES_DB: dkbbank
-    volumes:
-      - database-data:/var/lib/postgresql/data/
 
   bankaccount:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-    - "8080:8080"
+    - "8090:8090"
     restart: always
     depends_on:
       - postgresdb

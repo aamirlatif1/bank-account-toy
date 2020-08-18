@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -16,10 +15,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @Data
+@SequenceGenerator(name = "transaction_generator", sequenceName = "transaction_sequence")
 public class Transaction {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "transaction_generator")
     private Long id;
 
     private BigDecimal amount;

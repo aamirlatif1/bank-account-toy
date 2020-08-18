@@ -30,7 +30,7 @@ public class IbanServiceImpl implements IbanService {
         return new Iban.Builder()
                 .countryCode(CountryCode.getByCode(countryCode))
                 .bankCode(bankCode)
-                .accountNumber(String.format("%010d", accountNumber))
+                .accountNumber(String.format("%010d", Math.abs(accountNumber)))
                 .build();
     }
 

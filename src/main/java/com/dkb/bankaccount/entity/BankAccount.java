@@ -9,15 +9,16 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "bank_account")
+@Table(name = "BANK_ACCOUNT")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Data
+@SequenceGenerator(name = "account_generator", sequenceName = "account_sequence")
 public class BankAccount {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "account_generator")
     private Long id;
 
     private String firstName;

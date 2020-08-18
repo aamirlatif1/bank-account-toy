@@ -1,6 +1,6 @@
 
 ### Create bank account
-POST http://localhost:8080/accounts
+POST http://localhost:8090/accounts
 Content-Type: application/json
 
 {
@@ -11,12 +11,12 @@ Content-Type: application/json
 
 
 ### show account balance
-GET http://localhost:8080/accounts/iban/{{iban}}
+GET http://localhost:8090/accounts/iban/{{iban}}
 Accept: application/json
 
 
 ### Deposit amount in bank
-POST http://localhost:8080/transactions/deposit
+POST http://localhost:8090/transactions/deposit
 Content-Type: application/json
 
 {
@@ -27,7 +27,7 @@ Content-Type: application/json
 }
 
 ### transfer amount to other account
-POST http://localhost:8080/transactions/transfer
+POST http://localhost:8090/transactions/transfer
 Content-Type: application/json
 
 {
@@ -39,5 +39,5 @@ Content-Type: application/json
 }
 
 ### Get transaction history
-GET http://localhost:8080/transactions/history?date=2022-06-22&page=0&size=10
+GET http://localhost:8090/transactions/history?date=2022-06-22&page=0&size=10
 Accept: application/json

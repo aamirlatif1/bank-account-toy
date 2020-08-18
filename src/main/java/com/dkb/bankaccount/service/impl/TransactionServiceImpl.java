@@ -23,9 +23,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static java.util.Arrays.asList;
 
 @Service
 @Slf4j
@@ -37,6 +38,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final ModelMapper modelMapper;
 
     @Override
+    @Transactional
     public TransactionDTO depositAmount(final DepositRequest request) {
         log.info("deposit amount={} for iban={}",request.getAmount(), request.getIban());
 
@@ -54,6 +56,10 @@ public class TransactionServiceImpl implements TransactionService {
                 .build();
 
         transactionRepository.save(transaction);
+
+        bankAccount.setCurrentBalance(bankAccount.getCurrentBalance().add(request.getAmount()));
+        accountRepository.save(bankAccount);
+
 
         return modelMapper.map(transaction, TransactionDTO.class);
     }
@@ -95,12 +101,18 @@ public class TransactionServiceImpl implements TransactionService {
                 .build();
 
 
-        transactionRepository.saveAll(Arrays.asList(transaction, revTransaction));
+        transactionRepository.saveAll(asList(transaction, revTransaction));
 
         transaction.setRelatedTransactionId(revTransaction.getId());
         revTransaction.setRelatedTransactionId(transaction.getId());
 
-        transactionRepository.saveAll(Arrays.asList(transaction, revTransaction));
+        transactionRepository.saveAll(asList(transaction, revTransaction));
+
+        sourceAccount.setCurrentBalance(sourceAccount.getCurrentBalance().subtract(request.getAmount()));
+        destAccount.setCurrentBalance(sourceAccount.getCurrentBalance().add(request.getAmount()));
+
+        accountRepository.saveAll(asList(sourceAccount, destAccount));
+
         log.info("amount={} transfer to account={}", request.getAmount(), request.getSourceAccount() );
         return modelMapper.map(revTransaction, TransactionDTO.class);
     }
